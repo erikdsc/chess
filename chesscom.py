@@ -35,8 +35,7 @@ class MagnusCarlsen(threading.Thread):
         1 if white
     """
     def findColor(self):
-        first_digit= self.driver.find_element_by_xpath("//*[@x='0.75' and @y='90.75']")
-        return first_digit.text == "1"
+        return self.driver.find_element_by_xpath("//*[@x='0.75' and @y='90.75']") == 1
 
     """
     Returns ordered list of all moves that have been played
