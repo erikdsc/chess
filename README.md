@@ -13,4 +13,5 @@ to do:
  * grafisk overlay i selve brettet som alternativ til at den gjør trekket på egenhånd. piler som viser gode trekk
  * cookies så man ikke må logge inn hver jævla gang man starter scriptet
  * gui i stedet for command line
+ * lag tilsvarende script for lichess
  * 
