@@ -4,13 +4,15 @@
 Download from https://stockfishchess.org/download/ and place it in the same directory as chesscom.py.  
 NB: must be named "stockfish"
 
+##
 
-#### The following settings must be set for the script to work:
+#### The following settings must be set for the script to work with chess.com:
  * **Board and pieces**
    * **Coordinates:** Inside board
    * **Piece notation:** Text
    * **Move method:** NOT Drag pieces only
    * **Show legal moves:** On (For automatic moves) 
+##
 
 #### To do:
  * legg inn funksjonalitet for å ta gode trekk som ikke er det aller beste
