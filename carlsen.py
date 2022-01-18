@@ -2,9 +2,9 @@ import chess
 import chess.engine
 import os
 import threading
+import time
 from random import randint
 from platforms.chesscom import ChessCom
-import time
 
 class MagnusCarlsen(threading.Thread):
     """verdens beste sjakkspiller"""
@@ -16,13 +16,6 @@ class MagnusCarlsen(threading.Thread):
         self.auto = False
         self._stop_event = threading.Event()
         self._playing_event = threading.Event()
-
-    """
-    Converts individual letters to a string of their position in the alphabet
-    """
-    @staticmethod
-    def a_to_n(c):
-        return str(ord(c)-96)
 
     def stop(self):
         self._stop_event.set()
