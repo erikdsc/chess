@@ -7,7 +7,6 @@ class ChessCom:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.driver = webdriver.Firefox()
-        self.auto = False
 
     """
     Checks if the closest coordinate-digit on the board equals to 1
@@ -56,7 +55,6 @@ class ChessCom:
         board_x = board_rect["x"]
         board_y = board_rect["y"]
         cell_lengths = board_rect["width"] / 8
-
         origin = str(ord(move[0])-96) + move[1]
         board.find_element_by_xpath("div[starts-with(@class, 'piece ') and " + \
                                         "contains(@class, '%s')]" % origin).click()
