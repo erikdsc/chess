@@ -3,7 +3,7 @@ import chess.engine
 import os
 import threading
 from random import randint
-from chesscom import ChessCom
+from platforms.chesscom import ChessCom
 import time
 
 class MagnusCarlsen(threading.Thread):
@@ -112,7 +112,6 @@ class MagnusCarlsen(threading.Thread):
                 t.stop()
 
 if __name__ == "__main__":
-    p = ChessCom()
-    MagnusCarlsen.play(p)
-    exit()
+    platform = ChessCom()
+    MagnusCarlsen.play(platform)
 
