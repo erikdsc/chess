@@ -1,6 +1,6 @@
 # chess
 
-#### stockfish:
+#### Stockfish:
 Download from https://stockfishchess.org/download/ and place it in the same directory as chesscom.py.  
 NB: must be named "stockfish"
 
