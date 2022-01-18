@@ -3,44 +3,54 @@ import chess
 import chess.engine
 import os
 import threading
+import sys
 from random import randint
 
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 
-#gocoxin352@goqoez.com
+
 
 class MagnusCarlsen(threading.Thread):
-    """Thread class with a stop() method. The thread itself has to check
-    regularly for the stopped() condition."""
+    """verdens beste sjakkspiller"""
 
     def __init__(self,  driver, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        #self._stop_event = threading.Event()
         self.driver = driver
-        self.quit_game = False
+        self.auto = False
+        self._stop_event = threading.Event()
+        
 
     def stop(self):
-        self.quit_game = True
-        #self._stop_event.set()
+        self._stop_event.set()
 
     def stopped(self):
         return self._stop_event.is_set()
 
     """
+    Converts individual letters to a string of their position in the alphabet
+    """
+    @staticmethod
+    def a_to_n(c):
+        return str(ord(c)-96)
+
+    def toggle_auto(self):
+        self.auto = not self.auto
+
+    """
     Checks if the closest coordinate-digit on the board equals to 1
     Returns:
-        0 if black
-        1 if white
+        false if black
+        true if white
     """
-    def findColor(self):
+    def find_color(self):
         return self.driver.find_element_by_xpath("//*[@x='0.75' and @y='90.75']") == '1'
 
     """
     Returns ordered list of all moves that have been played
     """
-    def readMoves(self):
+    def read_moves(self):
         try:
             registered_moves = []
             move_list = self.driver.find_element_by_tag_name("vertical-move-list")
@@ -49,100 +59,113 @@ class MagnusCarlsen(threading.Thread):
                 for single_move in moves.find_elements_by_xpath("div[contains(@class, ' node')]"):
                     registered_moves.append(single_move.text)
             return registered_moves
-        except:
-            self.quit_game = True
-            time.sleep(1)
-            input("trykk enter når det neste gamet er klart\n")
-            t.run()
+        except Exception as e:
+            print(e)
 
-    def performMove(self, move):
-        letters = {
-            "a" : "1", "b" : "2", "c" : "3", "d" : "4",
-            "e" : "5", "f" : "6", "g" : "7", "h" : "8"
-        }
-
+    def perform_move(self, move):
         board = self.driver.find_element_by_tag_name("chess-board")
         board_rect = board.rect
         board_x = board_rect["x"]
         board_y = board_rect["y"]
         cell_lengths = board_rect["width"] / 8
 
-        origin = letters[move[0]] + move[1]
+        origin = self.a_to_n(move[0]) + move[1]
         board.find_element_by_xpath("div[starts-with(@class, 'piece ') and " + \
                                         "contains(@class, '%s')]" % origin).click()
         time.sleep(randint(0,100) / 1000)
         try:
-            dest = letters[move[2]] + move[3]
+            dest = self.a_to_n(move[2]) + move[3]
             destination = self.driver.find_element_by_xpath("//*[starts-with(@class, "+\
                 "'hint ') and contains(@class, '%s')]" % dest)
             action = webdriver.ActionChains(self.driver)
             action.move_to_element(destination).click().perform()
-        except:
-            dest = letters[move[2]] + move[3]
+        except Exception as e:
+            print(e)
+            dest = self.a_to_n(move[2]) + move[3]
             self.driver.find_element_by_xpath("//*[starts-with(@class, 'piece ')" +\
                     "and contains(@class, 'square-"+dest+"')]").click()
 
+    """
+    Resets the previous board and inserts all moves again
+    """
+    def update_board(self, board, move_list):
+        board.reset()
+        for move in move_list:
+            board.push_san(move)
+        return board
+
     def run(self):
-        self.quit_game = False
-        current_movelist = self.readMoves()
-        prev_movelist = []
-        color = self.findColor()
+        #oppsett
+        color = self.find_color()
         board = chess.Board()
-        while not (board.is_game_over() or self.quit_game):
-            while (prev_movelist == current_movelist or \
-                    len(current_movelist) % 2 == color):
-                time.sleep(0.2)
-                current_movelist= self.readMoves()
-                if (self.quit_game or board.is_game_over()):
-                    return
-            for i in range(len(current_movelist)-len(prev_movelist)):
-                print("Detected Move: \t",end="")
-                print(current_movelist[len(prev_movelist)+i])
-                board.push_san(current_movelist[len(prev_movelist)+i])
-            
-            best_move = engine.play(board, chess.engine.Limit(time=1000*randint(1,25) / 1000)).move
-            #time.sleep(randint(0,20) / 10)
-            #if randint(0,10) > 9:
-            #    time.sleep(5)
-            best_move = str(board.parse_san(str(best_move)))
-            print("Best move: \t %s" % best_move)
+        move_count = 0
+        
+        #spill
+        while not (board.is_game_over() or self.stopped()):
+            move_list = self.read_moves()
+            #nytt trekk:
+            if len(move_list) > move_count:
+                print(f"Detected move: {move_list[-1]}")
+                move_count = len(move_list)
+                #best move
+                if (move_count % 2 == color):
+                    board = self.update_board(board, move_list)
+                    best_move = engine.play(board, chess.engine.Limit(time=randint(50,200) / 1000)).move
+                    print("Best move:     %s" % board.san(best_move))
+                    if self.auto:
+                        best_move = str(board.parse_san(str(best_move)))
+                        if len(best_move) == 4:
+                            self.perform_move(best_move)
+                        else:
+                            print("promote or error")
+            time.sleep(0.1)
 
-            if len(best_move) == 4:
-                self.performMove(best_move)
-            else:
-                print("promote or error")
-
-            prev_movelist = current_movelist.copy()
-        print("Check mate!")
-     
 
 if __name__ == "__main__":
     try:
         path = os.getcwd()
         engine = chess.engine.SimpleEngine.popen_uci(path+'/stockfish')
         driver = webdriver.Firefox()
-        driver.get("http://www.chess.com/play/computer")
-        assert "Chess" in driver.title
-        input("klar?")
+        driver.get("https://www.chess.com/login_and_go")
+        
+        #login
+        with open("accounts.txt") as f:
+            accounts = [a.split() for a in f.readlines()] 
+            #select account if many are specified
+            if len(accounts) > 1:
+                print("Available accounts:")
+                for n, a in enumerate([a for a,_,_ in accounts]):
+                    print(n, ":", a)
+            
+                #NB: usikker konvertering
+                acc_n = int(input("enter the number of the account you want to log in with"))
+            else:
+                acc_n = 1
+            print(acc_n)
+            driver.find_element_by_id("username").send_keys(accounts[acc_n-1][1])
+            driver.find_element_by_id("password").send_keys(accounts[acc_n-1][2])
+            driver.find_element_by_id("login").click()
 
-        t = MagnusCarlsen(driver)#(target=chess_player, args=(driver, ))
-        t.start()
+        t = MagnusCarlsen(driver)
+        print("Type 'q' for exit,\nType 'n' for new,\nType 'a' to toggle automatic moves:\n\n") 
         inp = ""
         while (inp != "q"):
-            inp = input("Type 'q' for exit\nType 'n' for new\n") 
+            inp = input("")
             if inp == 'n':
-                t.stop()
-                #t.join()
-                input("trykk enter når det neste gamet er klart\n")
-                t.run()
+                if t.is_alive():
+                    t.stop()
+                    t.join()
+                t.start()
+            elif inp == 'a':
+                t.toggle_auto()
+        print("\nExiting...")
         t.stop()
         t.join()
-        
     except Exception as e:
         print(e)
         t.stop()
         t.join()
     finally:
+        time.sleep(3)
         engine.quit()
         driver.quit()
-        driver.close()
