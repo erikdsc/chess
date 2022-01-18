@@ -112,6 +112,5 @@ class MagnusCarlsen(threading.Thread):
                 t.stop()
 
 if __name__ == "__main__":
-    platform = ChessCom()
-    MagnusCarlsen.play(platform)
+    MagnusCarlsen.play(ChessCom)
 
