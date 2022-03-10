@@ -5,6 +5,7 @@ import threading
 import time
 from random import randint
 from platforms.chesscom import ChessCom
+from platforms.lichess import Lichess
 
 class MagnusCarlsen(threading.Thread):
     """verdens beste sjakkspiller"""
@@ -77,11 +78,12 @@ class MagnusCarlsen(threading.Thread):
     
     @staticmethod
     def play(platform):
+        path = os.getcwd()
+        platform.log_in()
+        t = MagnusCarlsen(platform)
+        t.start()
         try:
-            path = os.getcwd()
-            platform.log_in()
-            t = MagnusCarlsen(platform)
-            t.start()
+           
             print("Enter 'q' to exit,\nEnter 's' to start analysis,\nEnter 't' to stop analysis,")
             print("Enter 'a' to toggle automatic moves:\n\n")
             inp = ""
