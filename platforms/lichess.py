@@ -18,7 +18,7 @@ class Lichess:
 
     def log_in(self):
         self.driver.get("https://lichess.org/login")
-        with open("accounts/lichess.txt") as f:
+        with open("accounts/lichess.csv") as f:
             accounts = [a.split() for a in f.readlines()] 
             #select account if many are specified
             if len(accounts) > 1:

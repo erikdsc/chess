@@ -19,7 +19,7 @@ class ChessCom:
 
     def log_in(self):
         self.driver.get("https://www.chess.com/login_and_go")
-        with open("accounts/chesscom.txt") as f:
+        with open("accounts/chesscom.csv") as f:
             accounts = [a.split() for a in f.readlines()] 
             #select account if many are specified
             if len(accounts) > 1:
