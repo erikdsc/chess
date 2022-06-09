@@ -51,10 +51,6 @@ class ChessCom:
 
     def perform_move(self, move):
         board = self.driver.find_element(By.TAG_NAME, "chess-board")
-        board_rect = board.rect
-        board_x = board_rect["x"]
-        board_y = board_rect["y"]
-        cell_lengths = board_rect["width"] / 8
         origin = str(ord(move[0])-96) + move[1]
         board.find_element(By.XPATH, "div[starts-with(@class, 'piece ') and " + \
                                         "contains(@class, '%s')]" % origin).click()
