@@ -1,6 +1,8 @@
 # chess
+This repository contains code to automatically analyze boards in chess.com and lichess.com and suggest the best moves.
 
-## Prerequisites:
+
+## Software prerequisites:
 #### Stockfish:
 Download from https://stockfishchess.org/download/ and place it in the same directory as chesscom.py.  
 NB: must be named "stockfish"
@@ -15,6 +17,12 @@ NB: must be named "stockfish"
 https://github.com/mozilla/geckodriver/releases
 
 <br><br>
+## Setting up automatical log ins
+By adding your accounts to the csv files in the account folder, you can make the script automatically log you in.
+The format is:  
+`username email@domain.com password`  
+
+
 ## Website settings
 
 ### The following settings must be set for the script to work with chess.com:
@@ -24,11 +32,3 @@ https://github.com/mozilla/geckodriver/releases
    * **Move method:** NOT Drag pieces only
    * **Show legal moves:** On (For automatic moves) 
 ##
-
-#### To do:
- * legg inn funksjonalitet for å ta gode trekk som ikke er det aller beste
- * fiks delayene så de virker mer legit
- * grafisk overlay i selve brettet som alternativ til at den gjør trekket på egenhånd. piler som viser gode trekk
- * gui i stedet for command line
- * lag tilsvarende script for lichess
- * 
