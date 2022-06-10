@@ -8,13 +8,13 @@ class ChessCom:
     def __init__(self):
         self.driver = webdriver.Firefox()
 
-    """
-    Checks if the closest coordinate-digit on the board equals to 1
-    Returns:
-        false if black
-        true if white
-    """
     def find_color(self):
+        """
+        Checks if the closest coordinate-digit on the board equals to 1
+        Returns:
+            false if black
+            true if white
+        """
         return self.driver.find_element(By.XPATH, "//*[@x='0.75' and @y='90.75']") == '1'
 
     def log_in(self):
@@ -34,10 +34,9 @@ class ChessCom:
             self.driver.find_element(By.ID, "password").send_keys(accounts[acc_n-1][2])
             self.driver.find_element(By.ID, "login").click()
 
-    """
-    Returns ordered list of all moves that have been played
-    """
+    
     def read_moves(self):
+        """Returns ordered list of all moves that have been played"""
         try:
             registered_moves = []
             move_list = self.driver.find_element(By.TAG_NAME, "vertical-move-list")
@@ -52,8 +51,8 @@ class ChessCom:
     def perform_move(self, move):
         board = self.driver.find_element(By.TAG_NAME, "chess-board")
         origin = str(ord(move[0])-96) + move[1]
-        board.find_element(By.XPATH, "div[starts-with(@class, 'piece ') and " + \
-                                        "contains(@class, '%s')]" % origin).click()
+        board.find_element(By.XPATH, "div[starts-with(@class, 'piece ') and " +\
+                                     "contains(@class, '%s')]" % origin).click()
         try: 
             time.sleep(randint(20,100) / 1000)
             dest = str(ord(move[2])-96) + move[3]

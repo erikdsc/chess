@@ -10,11 +10,13 @@ from platforms.lichess import Lichess
 class MagnusCarlsen(threading.Thread):
     """verdens beste sjakkspiller"""
 
-    def __init__(self, platform, *args, **kwargs):
+    def __init__(self, platform, tkinter_root=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.platform = platform
+        self.gui = tkinter_root
         self.engine = chess.engine.SimpleEngine.popen_uci(os.getcwd()+"/stockfish")
         self.auto = False
+        self.play_move = False
         self._stop_event = threading.Event()
         self._playing_event = threading.Event()
 
@@ -37,10 +39,25 @@ class MagnusCarlsen(threading.Thread):
     def toggle_auto(self):
         self.auto = not self.auto
 
-    """
-    Resets the previous board and inserts all moves again
-    """
+    def play_best_move(self):
+        """Same as toggle_auto() but only runs once"""
+        self.play_move = True
+
+    def display_detected_move(self, move: str):
+        if self.gui is None:
+            print("Detected move: " + move)
+        else:
+            self.gui.set_detected_move(move)
+            
+    def display_best_move(self, move: str):
+        if self.gui is None:
+            print("Best move:     " + move)
+        else:
+            self.gui.set_best_move(move)
+            
+    
     def update_board(self, board, move_list):
+        """Resets the previous board and inserts all moves again"""
         board.reset()
         for move in move_list:
             board.push_san(move)
@@ -57,18 +74,22 @@ class MagnusCarlsen(threading.Thread):
                 while self.is_playing():
                     move_list = self.platform.read_moves()
                     if len(move_list) > move_count:
-                        print(f"Detected move: {move_list[-1]}")
+                        #print(f"Detected move: {move_list[-1]}")
+                        self.display_detected_move(move_list[-1])
                         move_count = len(move_list)
                         if (move_count % 2 == color):
                             board = self.update_board(board, move_list)
                             best_move = self.engine.play(board, chess.engine.Limit(time=randint(80,200) / 1000)).move
-                            print("Best move:     %s" % board.san(best_move))
-                            if self.auto:
+                            #print("Best move:     %s" % board.san(best_move))
+                            self.display_best_move(board.san(best_move))
+                            if self.auto or self.play_move:
                                 best_move = str(board.parse_san(str(best_move)))
                                 if len(best_move) == 4:
                                     self.platform.perform_move(best_move)
                                 else:
                                     print("promote or error")
+                                if self.play_move:
+                                    self.play_move = False
                     time.sleep(0.1)
             if self.stopped():
                 break
@@ -83,7 +104,6 @@ class MagnusCarlsen(threading.Thread):
         t = MagnusCarlsen(platform)
         t.start()
         try:
-           
             print("Enter 'q' to exit,\nEnter 's' to start analysis,\nEnter 't' to stop analysis,")
             print("Enter 'a' to toggle automatic moves:\n\n")
             inp = ""
