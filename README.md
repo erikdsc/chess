@@ -1,5 +1,5 @@
 # chess
-This repository contains code to automatically analyze boards in chess.com and lichess.com and sugges the best moves.  
+This repository contains code to automatically analyze boards in chess.com and lichess.com and suggest the best moves.  
 The program can also be set to automatically move the pieces on the board for you.  
 
 By combining [Selenium](https://selenium-python.readthedocs.io/) with [python-chess](https://python-chess.readthedocs.io/en/latest/), [stockfish](https://stockfishchess.org/download/) and native Python threads, I was able to create a script that could automatically find and perform the best chess moves available.  
