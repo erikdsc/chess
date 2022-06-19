@@ -38,6 +38,7 @@ class MagnusCarlsen(threading.Thread):
 
     def toggle_auto(self):
         self.auto = not self.auto
+        self.play_move = True
 
     def play_best_move(self):
         """Same as toggle_auto() but only runs once"""
@@ -73,7 +74,7 @@ class MagnusCarlsen(threading.Thread):
                 #playing
                 while self.is_playing():
                     move_list = self.platform.read_moves()
-                    if len(move_list) > move_count:
+                    if len(move_list) > move_count or self.play_move:
                         #print(f"Detected move: {move_list[-1]}")
                         self.display_detected_move(move_list[-1])
                         move_count = len(move_list)
